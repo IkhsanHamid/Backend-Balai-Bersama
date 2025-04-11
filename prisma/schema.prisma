@@ -1,0 +1,61 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+  engineType      = "binary"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model TouristProfile {
+  id          Int       @id @default(autoincrement())
+  userid      Int
+  phonenumber String?   @db.VarChar(20)
+  nationality String?   @db.VarChar(50)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  is_deleted  Boolean   @default(false)
+  User        User      @relation(fields: [userid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user")
+  Trip        Trip[]
+}
+
+model Trip {
+  id             Int            @id @default(autoincrement())
+  touristid      Int
+  startdate      DateTime       @db.Timestamptz(6)
+  enddate        DateTime       @db.Timestamptz(6)
+  destination    Json
+  created_at     DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?      @default(now()) @db.Timestamp(6)
+  is_deleted     Boolean        @default(false)
+  TouristProfile TouristProfile @relation(fields: [touristid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_tourist")
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  name           String           @db.VarChar(100)
+  email          String           @unique @db.VarChar(100)
+  password       String
+  role           user_role
+  created_at     DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?        @default(now()) @db.Timestamp(6)
+  is_deleted     Boolean          @default(false)
+  Authentication Authentication[]
+  TouristProfile TouristProfile[]
+}
+
+model Authentication {
+  id            Int    @id @default(autoincrement())
+  userid        Int
+  access_token  String
+  refresh_token String
+  User          User   @relation(fields: [userid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_auth_user")
+}
+
+enum user_role {
+  pegawai
+  turis
+}
