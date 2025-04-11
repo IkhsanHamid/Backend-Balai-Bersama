@@ -29,7 +29,7 @@ Backend API
 
 ## Endpoint 
 
-```https://xxxxxx.com```
+```https://backend-balai-bersama.vercel.app```
 
 
 thanks,
